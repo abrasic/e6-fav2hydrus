@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name         e621 fav2hydrus
-// @namespace    http://tampermonkey.net/
-// @version      0.1
-// @description  try to take over the world!
-// @author       You
+// @namespace    https://abrasic.com
+// @version      1.0
+// @description  Favoriting e621 posts imports it to Hydrus
+// @author       Abrasic
 // @match        http*://e621.net/*
 // @grant        GM_xmlhttpRequest
 // @grant        GM.setValue
