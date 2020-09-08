@@ -19,7 +19,7 @@ async function init(){
     var assetImported = false;
     var errorText = "";
 
-    $("body").append('<div id="f2h-settings" style="display:none; position:absolute;right:0;top: 0;background: rgba(0,0,0,0.9);padding: 2px;width: 200px;padding: 10px;height: 200px;"><h1>f2h</h1> <p>v1</p><div title="If the Hydrus Client API doesn\'t connect, the favorite button will be hidden. This acts as an option to discourage you from favoriting posts you like without saving them locally."><p><input id="f2h-hideFavBtn" type="checkbox"> Hide Fav Button Fail</p></div><div title="Your Hydrus Client API address">API Address<input id="f2h-address" type="text" value=""></div><div title="Your Hydrus Client API access key">Access Key<input id="f2h-accessKey" type="text"><p></p></div><button id="f2h_save">Save and close</button></div>');
+    $("body").append('<div id="f2h-settings" style="display:none; position:absolute;right:0;top: 0;background: rgba(0,0,0,0.9);padding: 2px;width: 200px;padding: 10px;height: 200px;"><h1>f2h</h1> <p>v1</p><div title="If the Hydrus Client API doesn\'t connect, the favorite button will be hidden. This acts as an option to discourage you from favoriting posts you like without saving them locally."><p><input id="f2h-hideFavBtn" type="checkbox"> Hide Fav Button on Fail</p></div><div title="Your Hydrus Client API address">API Address<input id="f2h-address" type="text" value=""></div><div title="Your Hydrus Client API access key">Access Key<input id="f2h-accessKey" type="text"><p></p></div><button id="f2h_save">Save and close</button></div>');
     $("#nav-more").after('<li id="nav-f2h"><a href="#" id="nav-f2h">f2h Settings</a></li>');
 
     if (hideFavBtnOnFail === true){
