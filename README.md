@@ -19,14 +19,19 @@ This script requires Hydrus' Client API to run.
 6) In the *review services* window, click **open client api base url** and oopy the IP address it took you to. You will also need that for later.
 
 # Preperation (Userscript)
-Just a little more to do!
+Lastly, we need to prepare the userscript.
 
-When you visit any e621 page, you should see a "f2h Settings" button in the top nav bar. Click the button to toggle the settings window at any time.
+When you visit the e621 posts page, you should see a "f2h Settings" button in the top nav bar. Click the button to toggle the settings window at any time.
 
-**Hide Fav Button on Fail** > If the Hydrus API does not respond, the favorite buttons will be hidden. This option acts as a discourager in order to save all posts that you like locally, so if they are deleted off the internet somehow, you have a backup. Lucky you!
 
 **API Address** > The IP address that the API runs on that you copied from step 6 above. By default it is `http://127.0.0.1:45869/`
 
 **Access key** > The access key you copied from step 4 above.
 
 Once all settings are how you need them, click "Save and close". The script should *finally* start working.
+
+**Hide Fav Button on Fail** > If the Hydrus API does not respond, the favorite buttons will be hidden. This option acts as a discourager in order to save all posts that you like locally, so if they are deleted off the internet somehow, you have a backup. Lucky you!
+
+**Import Tags** > Enabled by default. Posts that are imported will be applied their **artist**, **species** and **character** tags into Hydrus.
+
+**Include General Tags** > Disabled by default. When enabled, all general tags will be applied to the imported post.
