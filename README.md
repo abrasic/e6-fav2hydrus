@@ -7,6 +7,7 @@ This is mostly is a practice script to see how capable I am with making stuff in
 1) Download [Tampermonkey](https://www.tampermonkey.net/) for your browser
 2) Locate the "this.user.js" file in this repo and click "Raw".
 3) Click "Install" when Tampermonkey tab shows up.
+
 **Upon using the script for the first time you will encounter popups from Tampermonkey asking you to accept outside requests. Click "always allow" when any of them pop up.**
 
 # Preperation (Hydrus)
