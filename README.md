@@ -19,6 +19,8 @@ This script requires Hydrus' Client API to run.
 6) In the *review services* window, click **open client api base url** and oopy the IP address it took you to. You will also need that for later.
 
 # Preperation (Userscript)
+```Upon using the script for the first time you will encounter popups from Tampermonkey asking you to accept outside requests. Click "always allow" when any of them pop up.```
+
 Lastly, we need to prepare the userscript.
 
 When you visit the e621 posts page, you should see a "f2h Settings" button in the top nav bar. Click the button to toggle the settings window at any time.
