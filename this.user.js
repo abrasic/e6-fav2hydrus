@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         e621 fav2hydrus
 // @namespace    https://abrasic.com
-// @version      1.0
+// @version      1.1
 // @description  Favoriting e621 posts imports it to Hydrus
 // @author       Abrasic
 // @match        http*://e621.net/*
@@ -16,10 +16,14 @@ async function init(){
     var hideFavBtnOnFail = await GM.getValue("hideFavBtnOnFail", true);
     var address = await GM.getValue("address","http://127.0.0.1:45869");
     var accessKey = await GM.getValue("accessKey", "1eae48f6d826762be9fea491be919ccdb948ba45650f2da46b26b320faa94141");
+    var importTags = await GM.getValue("importTags", true);
+    var importGeneral = await GM.getValue("importGeneral", true);
     var assetImported = false;
     var errorText = "";
+    var tags = [];
+    var assetId = window.location.pathname.substring(window.location.pathname.lastIndexOf('/')+1);
 
-    $("body").append('<div id="f2h-settings" style="display:none; position:absolute;right:0;top: 0;background: rgba(0,0,0,0.9);padding: 2px;width: 200px;padding: 10px;height: 200px;"><h1>f2h</h1> <p>v1</p><div title="If the Hydrus Client API doesn\'t connect, the favorite button will be hidden. This acts as an option to discourage you from favoriting posts you like without saving them locally."><p><input id="f2h-hideFavBtn" type="checkbox"> Hide Fav Button on Fail</p></div><div title="Your Hydrus Client API address">API Address<input id="f2h-address" type="text" value=""></div><div title="Your Hydrus Client API access key">Access Key<input id="f2h-accessKey" type="text"><p></p></div><button id="f2h_save">Save and close</button></div>');
+    $("body").append('<div id="f2h-settings" style="display:none; position:absolute;right:0;top: 0;background: rgba(0,0,0,0.9);padding: 2px;width: 200px;padding: 10px;height: 500px;"><h1>f2h</h1> <p>v1.1</p> <div>API Address<input id="f2h-address" type="text" value=""></div> <div><p>Access Key<input id="f2h-accessKey" type="text"></p></div> <div><p><input id="f2h-hideFavBtn" type="checkbox"> Hide Fav Button on Fail</p></div> <div><p><input id="f2h-importTags" type="checkbox"> Import Tags</p></div><div style="margin-left:10px"><p><input id="f2h-importGeneral" type="checkbox"> Include General Tags</p></div><button id="f2h_save">Save and close</button></div></div>');
     $("#nav-more").after('<li id="nav-f2h"><a href="#" id="nav-f2h">f2h Settings</a></li>');
 
     if (hideFavBtnOnFail === true){
@@ -28,15 +32,17 @@ async function init(){
             $("button#add-to-favorites").css("display", "none");
         }
     }
+    if (await GM.getValue("importTags") === false ){
+        document.getElementById('f2h-importGeneral').disabled = true
+    } else {
+        document.getElementById('f2h-importGeneral').disabled = false
+    }
 
-    var hideFavCheck = document.getElementById("f2h-hideFavBtn");
-    hideFavCheck.checked = await GM.getValue("hideFavBtnOnFail");
-
-    var inputAddress = document.getElementById("f2h-address");
-    inputAddress.value = await GM.getValue("address");
-
-    var inputAccessKey = document.getElementById("f2h-accessKey");
-    inputAccessKey.value = await GM.getValue("accessKey");
+    document.getElementById("f2h-address").value = await GM.getValue("address");
+    document.getElementById("f2h-accessKey").value = await GM.getValue("accessKey");
+    document.getElementById("f2h-hideFavBtn").checked = await GM.getValue("hideFavBtnOnFail");
+    document.getElementById("f2h-importTags").checked = await GM.getValue("importTags");
+    document.getElementById("f2h-importGeneral").checked = await GM.getValue("importGeneral");
 
     async function showError(){
         if (await GM.getValue("hideFavBtnOnFail",true)) {
@@ -48,6 +54,63 @@ async function init(){
         apiReady = false;
 
     }
+
+    if (await GM.getValue("importTags") === true){
+        GM_xmlhttpRequest ( {
+            method: "GET",
+            url: "https://e621.net/posts.json?tags=id:" + assetId,
+            onload: function (response) {
+                function isJson(str) {
+                    try {
+                        JSON.parse(str);
+                    } catch (err) {
+                        return false;
+                    }
+                    return true;
+                }
+                if (isJson(response.responseText)){
+                    $('#f2h-status').html('&#128305; Applying tags...');
+                    var i;
+                    var json = JSON.parse(response.responseText);
+                    if (json.posts[0]){
+                        var tagList = json.posts[0].tags
+                        for (i = 0; i < tagList.species.length; i++) {
+                            tags.push('"species:' + tagList.species[i] + '"');
+                        }
+                        console.log(tags);
+                        for (i = 0; i < tagList.character.length; i++) {
+                            tags.push('"character:' + tagList.character[i] + '"');
+                        }
+                        console.log(tags);
+                        for (i = 0; i < tagList.artist.length; i++) {
+                            tags.push('"creator:' + tagList.artist[i] + '"');
+                        }
+                        console.log(tags);
+                        if (importGeneral === true){
+                            for (i = 0; i < tagList.general.length; i++) {
+                                tags.push('"' + tagList.general[i] + '"');
+                            }
+                        }
+
+                        tags = "[ " + tags + " ]"
+                        console.log(tags);
+                    } else {
+                        errorText = "e621 API returned an error: " + response.responseText;
+                        showError();
+                    }
+                } else {
+                    errorText = "e621 API returned an error: " + response.responseText;
+                    showError();
+                }
+
+            },
+            onerror: function (response) {
+                errorText = "e621 API returned an error: " + response.responseText;
+                showError();
+            },
+        });
+    }
+
 
     GM_xmlhttpRequest ( {
         method:     "GET",
@@ -76,12 +139,13 @@ async function init(){
         },
     });
 
-    $("button#add-fav-button").click(function() {
+    $("button#add-fav-button").click(async function() {
         if ($("button#add-fav-button").attr("class") == "button btn-success") {
             if (apiReady && assetImported === false){
+                $('#image-extra-controls').after('<div id="f2h-status" class="notice notice-parent" id="pending-approval-notice">&#128305; Importing asset...</div>');
                 var assetUrl = $("#image-container").attr("data-file-url");
-                var pathJson = '{"url": "'+assetUrl+'"}';
-
+                var pathJson = '{"url": "'+assetUrl+'","service_names_to_tags" : { "my tags" : '+tags+'}}';
+                console.log(pathJson);
                 GM_xmlhttpRequest ( {
                     method: "POST",
                     url: address + "/add_urls/add_url",
@@ -103,7 +167,7 @@ async function init(){
                             var json = JSON.parse(response.responseText);
                             if (json["human_result_text"]){
                                 assetImported = true;
-                                $('#image-extra-controls').after('<div class="notice notice-parent" id="pending-approval-notice">&#128305; Asset imported to Hydrus.</div>');
+                                $('#f2h-status').html('&#128305; Asset imported to Hydrus');
                             } else {
                                 errorText = "Hydrus API returned an error: " + response.responseText;
                                 showError();
@@ -115,7 +179,8 @@ async function init(){
 
                     },
                     onerror: function (response) {
-                        showError("test");
+                        errorText = "Hydrus API returned an error: " + response.responseText;
+                        showError();
                     },
                 });
             }
@@ -134,23 +199,34 @@ async function init(){
 window.onload = init()
 
 document.addEventListener("click", async function(event){
+    var hideFavBtnOnFail = document.getElementById('f2h-hideFavBtn');
+    var address = document.getElementById('f2h-address');
+    var accessKey = document.getElementById('f2h-accessKey');
+    var importTags = document.getElementById('f2h-importTags');
+    var importGeneral = document.getElementById('f2h-importGeneral');
+
     // console.log(event.target.id);
     if (event.target.id == "f2h_save"){
         $("#f2h-settings").css("display","none");
-        var hideFavCheck = document.getElementById('f2h-hideFavBtn');
-        await GM.setValue("hideFavBtnOnFail", hideFavCheck.checked);
-
-        var address = document.getElementById('f2h-address');
+        await GM.setValue("hideFavBtnOnFail", hideFavBtnOnFail.checked);
         await GM.setValue("address", address.value);
-
-        var accessKey = document.getElementById('f2h-accessKey');
         await GM.setValue("accessKey", accessKey.value);
+        await GM.setValue("importTags", importTags.checked);
+        await GM.setValue("importGeneral", importGeneral.checked);
         $("#nav-f2h").html("(refresh to apply changes)");
     }
     if (event.target.id == "remove-fav-button"){
         if (await GM.getValue("hideFavBtnOnFail", true) && apiReady === false) {
             $("#add-fav-button").remove();
             $("#add-to-favorites").remove();
+        }
+    }
+    if (event.target.id == "f2h-importTags"){
+        if (importTags.checked === false) {
+            importGeneral.checked = false
+            importGeneral.disabled = true
+        } else {
+            importGeneral.disabled = false
         }
     }
 });
