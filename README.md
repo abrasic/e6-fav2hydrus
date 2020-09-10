@@ -15,7 +15,7 @@ This script requires Hydrus' Client API to run.
 2) Make sure "do not run client api service" is **unchecked** and click *apply*.
 3) Then go to **services > review services**, click the *client api* tab and click **add > manually**.
 4) In the new window, copy the access key shown into a notepad or something. You will need it for later.
-5) Give this api service the **add urls for processing** permission. Click *apply*.
+5) Give this api service the **add urls for processing** and **add tags to files** permissions. Click *apply*.
 6) In the *review services* window, click **open client api base url** and oopy the IP address it took you to. You will also need that for later.
 
 # Preperation (Userscript)
