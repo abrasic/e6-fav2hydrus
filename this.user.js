@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         e621 fav2hydrus
 // @namespace    https://abrasic.com
-// @version      1.1
+// @version      1.2
 // @description  Favoriting e621 posts imports it to Hydrus
 // @author       Abrasic
 // @match        http*://e621.net/*
@@ -75,24 +75,19 @@ async function init(){
                     if (json.posts[0]){
                         var tagList = json.posts[0].tags
                         for (i = 0; i < tagList.species.length; i++) {
-                            tags.push('"species:' + tagList.species[i] + '"');
+                            tags.push('species:' + tagList.species[i]);
                         }
-                        console.log(tags);
                         for (i = 0; i < tagList.character.length; i++) {
-                            tags.push('"character:' + tagList.character[i] + '"');
+                            tags.push('character:' + tagList.character[i]);
                         }
-                        console.log(tags);
                         for (i = 0; i < tagList.artist.length; i++) {
-                            tags.push('"creator:' + tagList.artist[i] + '"');
+                            tags.push('creator:' + tagList.artist[i]);
                         }
-                        console.log(tags);
                         if (importGeneral === true){
                             for (i = 0; i < tagList.general.length; i++) {
-                                tags.push('"' + tagList.general[i] + '"');
+                                tags.push(tagList.general[i]);
                             }
                         }
-
-                        tags = "[ " + tags + " ]"
                         console.log(tags);
                     } else {
                         errorText = "e621 API returned an error: " + response.responseText;
@@ -144,8 +139,7 @@ async function init(){
             if (apiReady && assetImported === false){
                 $('#image-extra-controls').after('<div id="f2h-status" class="notice notice-parent" id="pending-approval-notice">&#128305; Importing asset...</div>');
                 var assetUrl = $("#image-container").attr("data-file-url");
-                var pathJson = '{"url": "'+assetUrl+'","service_names_to_tags" : { "my tags" : '+tags+'}}';
-                console.log(pathJson);
+                var pathJson = JSON.stringify({"url" : assetUrl, "service_names_to_tags" : { "my tags" : tags }});
                 GM_xmlhttpRequest ( {
                     method: "POST",
                     url: address + "/add_urls/add_url",
