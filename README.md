@@ -19,6 +19,8 @@ This script requires Hydrus' Client API to run.
 4) In the new window, copy the access key shown into a notepad or something. You will need it for later.
 5) Give this api service the **add urls for processing** and **add tags to files** permissions. Click *apply*.
 6) In the *review services* window, click **open client api base url** and oopy the IP address it took you to. You will also need that for later.
+7) Right-click on the page tabs, then click **new page > download > url**
+8) Click on **tag import options** and untick the box in the **default options** category and tick the **get tags** box at the bottom of the window. Click **apply**.
 
 # Preperation (Userscript)
 Lastly, we need to prepare the userscript.
