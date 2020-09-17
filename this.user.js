@@ -23,7 +23,7 @@ async function init(){
     var tags = [];
     var assetId = window.location.pathname.substring(window.location.pathname.lastIndexOf('/')+1);
 
-    $("body").append('<div id="f2h-settings" style="display:none; position:absolute;right:0;top: 0;background: rgba(0,0,0,0.9);padding: 2px;width: 200px;padding: 10px;height: 500px;"><h1>f2h</h1> <p>v1.1</p> <div>API Address<input id="f2h-address" type="text" value=""></div> <div><p>Access Key<input id="f2h-accessKey" type="text"></p></div> <div><p><input id="f2h-hideFavBtn" type="checkbox"> Hide Fav Button on Fail</p></div> <div><p><input id="f2h-importTags" type="checkbox"> Import Tags</p></div><div style="margin-left:10px"><p><input id="f2h-importGeneral" type="checkbox"> Include General Tags</p></div><button id="f2h_save">Save and close</button></div></div>');
+    $("body").append('<div id="f2h-settings" style="display:none; position:absolute;right:0;top: 0;background: rgba(0,0,0,0.9);padding: 2px;width: 200px;padding: 10px;height: 500px;"><h1>f2h</h1> <p>v1.2</p> <div>API Address<input id="f2h-address" type="text" value=""></div> <div><p>Access Key<input id="f2h-accessKey" type="text"></p></div> <div><p><input id="f2h-hideFavBtn" type="checkbox"> Hide Fav Button on Fail</p></div> <div><p><input id="f2h-importTags" type="checkbox"> Import Tags</p></div><div style="margin-left:10px"><p><input id="f2h-importGeneral" type="checkbox"> Include General Tags</p></div><button id="f2h_save">Save and close</button></div></div>');
     $("#nav-more").after('<li id="nav-f2h"><a href="#" id="nav-f2h">f2h Settings</a></li>');
 
     if (hideFavBtnOnFail === true){
