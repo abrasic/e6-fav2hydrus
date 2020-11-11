@@ -2,6 +2,8 @@
 A Tampermonkey script that auto-imports posts to Hydrus that you favorite on e621.
 This is mostly is a practice script to see how capable I am with making stuff in Tampermonkey. It may or may not be useful to you at all.
 
+**Tested as working on Hydrus v411 network v18.**
+
 # Install
 0) Download [Hydrus Network](https://hydrusnetwork.github.io/hydrus/) if you don't have it yet.
 1) Download [Tampermonkey](https://www.tampermonkey.net/) for your browser
@@ -21,6 +23,8 @@ This script requires Hydrus' Client API to run.
 6) In the *review services* window, click **open client api base url** and copy the IP address it took you to. You will also need that for later.
 7) Right-click on the page tabs, then click **new page > download > url**
 8) Click on **tag import options** and untick the box in the **default options** category and tick the **get tags** box at the bottom of the window. Click **apply**.
+
+**Important:** You need to make sure you always have a url import page open with the options specified in step 8, otherwise imported posts will not include any tags.
 
 # Preperation (Userscript)
 When you visit the e621 posts page, you should see a "f2h Settings" button in the top nav bar. Click the button to toggle the settings window at any time.
