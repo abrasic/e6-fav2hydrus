@@ -2,7 +2,7 @@
 A Tampermonkey script that auto-imports posts to Hydrus that you favorite on e621.
 This is mostly is a practice script to see how capable I am with making stuff in Tampermonkey. It may or may not be useful to you at all.
 
-**Tested as working on Hydrus v411 network v18.**
+**Tested as working on Hydrus v417 network v19.**
 
 # Install
 0) Download [Hydrus Network](https://hydrusnetwork.github.io/hydrus/) if you don't have it yet.
