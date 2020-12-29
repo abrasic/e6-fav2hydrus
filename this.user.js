@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         e621 fav2hydrus
 // @namespace    https://abrasic.com
-// @version      1.2
+// @version      1.2.1
 // @description  Favoriting e621 posts imports it to Hydrus
 // @author       Abrasic
 // @match        http*://e621.net/*
@@ -19,9 +19,10 @@ async function init(){
     var importTags = await GM.getValue("importTags", true);
     var importGeneral = await GM.getValue("importGeneral", true);
     var assetImported = false;
-    var errorText = "";
     var tags = [];
+    var pageUrl = location.protocol + '//' + location.host + location.pathname;
     var assetId = window.location.pathname.substring(window.location.pathname.lastIndexOf('/')+1);
+    var fileHash = undefined;
 
     $("body").append('<div id="f2h-settings" style="display:none; position:absolute;right:0;top: 0;background: rgba(0,0,0,0.9);padding: 2px;width: 200px;padding: 10px;height: 500px;"><h1>f2h</h1> <p>v1.2</p> <div>API Address<input id="f2h-address" type="text" value=""></div> <div><p>Access Key<input id="f2h-accessKey" type="text"></p></div> <div><p><input id="f2h-hideFavBtn" type="checkbox"> Hide Fav Button on Fail</p></div> <div><p><input id="f2h-importTags" type="checkbox"> Import Tags</p></div><div style="margin-left:10px"><p><input id="f2h-importGeneral" type="checkbox"> Include General Tags</p></div><button id="f2h_save">Save and close</button></div></div>');
     $("#nav-more").after('<li id="nav-f2h"><a href="#" id="nav-f2h">f2h Settings</a></li>');
@@ -44,13 +45,13 @@ async function init(){
     document.getElementById("f2h-importTags").checked = await GM.getValue("importTags");
     document.getElementById("f2h-importGeneral").checked = await GM.getValue("importGeneral");
 
-    async function showError(){
+    async function showError(str){
         if (await GM.getValue("hideFavBtnOnFail",true)) {
             $("#add-fav-button").remove();
             $("#add-to-favorites").remove();
         }
 
-        $("#image-extra-controls").after("<div class='notice notice-deleted'>&#128305; ERROR: "+ errorText +"</div>");
+        $("#image-extra-controls").after("<div class='notice notice-deleted'>&#128305; ERROR: "+ str +"</div>");
         apiReady = false;
 
     }
@@ -74,6 +75,7 @@ async function init(){
                     var json = JSON.parse(response.responseText);
                     if (json.posts[0]){
                         var tagList = json.posts[0].tags
+                        var getHash = json.posts[0].file.md5
                         for (i = 0; i < tagList.species.length; i++) {
                             tags.push('species:' + tagList.species[i]);
                         }
@@ -88,24 +90,21 @@ async function init(){
                                 tags.push(tagList.general[i]);
                             }
                         }
+                        fileHash = getHash
                         console.log(tags);
+                        console.log(fileHash);
                     } else {
-                        errorText = "e621 API returned an error: " + response.responseText;
-                        showError();
+                        // do nothing. it's' deleted.
                     }
                 } else {
-                    errorText = "e621 API returned an error: " + response.responseText;
-                    showError();
+                    showError("e621 API returned an error: " + response.responseText);
                 }
-
             },
             onerror: function (response) {
-                errorText = "e621 API returned an error: " + response.responseText;
-                showError();
+                showError("e621 API returned an error: " + response.responseText);
             },
         });
     }
-
 
     GM_xmlhttpRequest ( {
         method:     "GET",
@@ -123,13 +122,11 @@ async function init(){
                 $("button#add-fav-button").append(" &#128305;");
                 apiReady = true;
             } else {
-                errorText = 'Address "' +address+ '" is not a Hydrus Client API.'
-                showError();
+                showError('Address "' +address+ '" is not a Hydrus Client API.');
             }
         },
         onerror: function (response) {
-            errorText = 'Address "' +address+ '" is not responding.'
-            showError();
+            showError('Address "' +address+ '" is not responding.');
             apiReady = false;
         },
     });
@@ -161,20 +158,39 @@ async function init(){
                             var json = JSON.parse(response.responseText);
                             if (json["human_result_text"]){
                                 assetImported = true;
-                                $('#f2h-status').html('&#128305; Asset imported to Hydrus');
+                                console.log(pageUrl);
+                                var urlJson = JSON.stringify({"url_to_add" : pageUrl, "hash" : fileHash });
+                                GM_xmlhttpRequest ( {
+                                    method: "POST",
+                                    url: address + "/add_urls/associate_url",
+                                    data: urlJson,
+                                    headers: {
+                                        "Hydrus-Client-API-Access-Key": accessKey,
+                                        "Content-Type": "application/json"
+                                    },
+                                    onload: function (response) {
+                                        if (response.status == 200){
+                                            assetImported = true;
+                                            $('#f2h-status').html('&#128305; Asset imported to Hydrus');
+                                        } else {
+                                            showError("Hydrus API returned an error code " + response.status);
+                                        }
+
+                                    },
+                                    onerror: function (response) {
+                                        showError("Hydrus API returned an error: " + response.responseText);
+                                    },
+                                });
                             } else {
-                                errorText = "Hydrus API returned an error: " + response.responseText;
-                                showError();
+                                showError("Hydrus API returned an error: " + response.responseText);
                             }
                         } else {
-                            errorText = "Hydrus API returned an error: " + response.responseText;
-                            showError();
+                            showError("Hydrus API returned an error: " + response.responseText);
                         }
 
                     },
                     onerror: function (response) {
-                        errorText = "Hydrus API returned an error: " + response.responseText;
-                        showError();
+                        showError("Hydrus API returned an error: " + response.responseText);
                     },
                 });
             }
