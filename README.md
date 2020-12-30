@@ -2,6 +2,8 @@
 A Tampermonkey script that auto-imports posts to Hydrus that you favorite on e621.
 This is mostly is a practice script to see how capable I am with making stuff in Tampermonkey. It may or may not be useful to you at all.
 
+Let's say you favorite a very obscure post you really like on e6, but little do you know its going to get deleted because of a takedown request. Unless you either saved it locally or it was uploaded elsewhere, you're out of luck. This script _attempts_ to prevent this from happening by using the hydrus network.
+
 **Tested as working on Hydrus v417 network v19.**
 
 # Install
